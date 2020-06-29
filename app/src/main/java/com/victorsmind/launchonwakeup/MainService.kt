@@ -3,9 +3,13 @@ package com.victorsmind.launchonwakeup
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.os.IBinder
+import android.os.SystemClock.sleep
 import android.util.Log
 import androidx.core.app.NotificationCompat
 
@@ -53,21 +57,17 @@ class MainService : Service() {
         /** System Defined Broadcast  */
         theFilter.addAction(Intent.ACTION_SCREEN_ON)
         theFilter.addAction(Intent.ACTION_BOOT_COMPLETED)
-        theFilter.addAction(STREAM_MUTE_CHANGED_ACTION)
-        theFilter.addAction(INTENT)
 
         mPowerKeyReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 val strAction = intent.action
 
-                Log.e("onReceive", "onReceive called")
-                if (strAction == Intent.ACTION_SCREEN_ON ||
-                    strAction == Intent.ACTION_BOOT_COMPLETED
-                ) {
+                if (strAction == Intent.ACTION_SCREEN_ON || strAction == Intent.ACTION_BOOT_COMPLETED) {
                     Log.i("LaunchOnWakeUp", "Caught Intent!!!!! ${strAction}")
 
-                    // > Your playground~!
-                    val launchIntent: Intent? = packageManager.getLaunchIntentForPackage("tc.planeta.tv.stb")
+                    val launchIntent: Intent? =
+                        packageManager.getLaunchIntentForPackage("tc.planeta.tv.stb")
+                    sleep(1000)
 //                    val launchIntent = Intent()
 //                    launchIntent.component = ComponentName("tc.planeta.tv.stb"                    )
 //                    startActivity(intent)
@@ -85,13 +85,6 @@ class MainService : Service() {
         }
 
         applicationContext.registerReceiver(mPowerKeyReceiver, theFilter)
-        Log.i("LaunchOnWakeUp", "Broadcast receiver registered.")
-    }
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.i("LaunchOnWakeUp", "My service started")
-
-        return super.onStartCommand(intent, flags, startId)
     }
 
     private fun unregisterReceiver() {
@@ -108,9 +101,5 @@ class MainService : Service() {
             applicationContext.unregisterReceiver(mPowerKeyReceiver)
             mPowerKeyReceiver = null
         }
-    }
-
-    companion object {
-        val STREAM_MUTE_CHANGED_ACTION = "android.media.STREAM_MUTE_CHANGED_ACTION"
     }
 }

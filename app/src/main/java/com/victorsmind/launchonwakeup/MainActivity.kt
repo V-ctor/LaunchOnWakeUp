@@ -1,12 +1,16 @@
 package com.victorsmind.launchonwakeup
 
+import android.app.Instrumentation
 import android.content.Intent
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlin.concurrent.thread
 
 
 class MainActivity : AppCompatActivity() {
@@ -39,6 +43,42 @@ class MainActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.action_settings -> true
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    fun sendMessage(view: View) {
+        val launchIntent: Intent? = packageManager.getLaunchIntentForPackage("tc.planeta.tv.stb")
+//        val launchIntent: Intent? = packageManager.getLaunchIntentForPackage("ru.planeta.tv.activities.mytv.MyTvActivity")
+/*        val launchIntent = Intent(Intent.ACTION_MAIN)
+        launchIntent.setClassName(
+            "tc.planeta.tv.stb",
+            "ru.planeta.tv.activities.mytv.MyTvActivity"
+        )*/
+//        val launchIntent: Intent? = Intent()
+//        launchIntent.component = ComponentName("tc.planeta.tv.stb", "ru.planeta.tv.activities.ShowcaseActivity")
+//        launchIntent?.component = ComponentName("tc.planeta.tv.stb", "ru.planeta.tv.activities.PlaybackActivity")
+
+        if (launchIntent != null) {
+            startActivity(launchIntent)
+//            inst.sendKeyDownUpSync(KeyEvent.KEYCODE_BUTTON_1)
+            thread {
+                val inst = Instrumentation()
+                inst.sendKeyDownUpSync(KeyEvent.KEYCODE_1)
+//            Thread.sleep(20)
+                inst.sendKeyDownUpSync(KeyEvent.KEYCODE_1)
+            }.start()
+            /*           val mInputConnection =
+                           BaseInputConnection(findViewById("tc.planeta.tv.stb"), true)
+                       val kd = KeyEvent(
+                           KeyEvent.ACTION_DOWN,
+                           KeyEvent.KEYCODE_1
+                       )
+                       val ku = KeyEvent(
+                           KeyEvent.ACTION_UP,
+                           KeyEvent.KEYCODE_1
+                       )
+                       mInputConnection.sendKeyEvent(kd)
+                       mInputConnection.sendKeyEvent(ku)*/
         }
     }
 }
