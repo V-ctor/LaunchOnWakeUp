@@ -2,18 +2,25 @@ package com.victorsmind.launchonwakeup
 
 import android.app.Instrumentation
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Spinner
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.content_main.*
 import kotlin.concurrent.thread
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
+
+    var packageNameForStart: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,10 +31,26 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(this, MainService::class.java)
         startService(intent)
 
-        fab.setOnClickListener { view ->
+/*        button.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
-        }
+        }*/
+        //get the spinner from the xml.
+//        val dropdown: Spinner = findViewById(R.id.activity_main)
+        val dropdown: Spinner = spinner1
+        spinner1.onItemSelectedListener = this;
+//create a list of items for the spinner.
+//        val items = arrayOf("1", "2", "three")
+        val pm = packageManager
+//get a list of installed apps.
+//get a list of installed apps.
+        val packages = pm.getInstalledApplications(PackageManager.GET_META_DATA)
+        val items = packages.map { it.packageName }
+//create an adapter to describe how the items are displayed, adapters are used in several places in android.
+//There are multiple variations of this, but this is the basic variant.
+//        val adapter = ArrayAdapter(this, R.layout.simple_spinner_dropdown_item, items)
+        val adapter = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, items)
+        dropdown.adapter = adapter
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -79,6 +102,28 @@ class MainActivity : AppCompatActivity() {
                        )
                        mInputConnection.sendKeyEvent(kd)
                        mInputConnection.sendKeyEvent(ku)*/
+        }
+    }
+
+    override fun onNothingSelected(p0: AdapterView<*>?) {
+//        TODO("Not yet implemented")
+    }
+
+    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+//        TODO("Not yet implemented")
+        packageNameForStart = p0?.getItemAtPosition(p2)?.toString()
+    }
+
+    fun onStartButtonClick(view: View?) {
+        runCatching {
+            packageNameForStart
+                ?.let {
+                    packageManager.getLaunchIntentForPackage(it)
+                        ?: throw IllegalArgumentException("Package $it not found")
+                }
+                ?.let { startActivity(it) }
+        }.onFailure {
+            Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
         }
     }
 }
