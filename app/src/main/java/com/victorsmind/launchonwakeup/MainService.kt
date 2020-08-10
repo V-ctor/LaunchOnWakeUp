@@ -3,20 +3,18 @@ package com.victorsmind.launchonwakeup
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.os.IBinder
 import android.os.SystemClock.sleep
-import android.preference.PreferenceManager
 import androidx.core.app.NotificationCompat
 
 class MainService : Service() {
 
-    private val settings: SharedPreferences by lazy {
-        PreferenceManager.getDefaultSharedPreferences(
-            this
-        )
-    }
+    private val storage = Storage(this)
 
     override fun onBind(p0: Intent?): IBinder? {
         return null
@@ -63,7 +61,7 @@ class MainService : Service() {
             override fun onReceive(context: Context, intent: Intent) {
                 val strAction = intent.action
                 if (strAction == Intent.ACTION_SCREEN_ON || strAction == Intent.ACTION_BOOT_COMPLETED) {
-                    settings.getString(MainActivity.AUTO_START_PACKAGE_KEY, null)?.let {
+                    storage.getSettings().autoStartApp?.let {
                         packageManager.getLaunchIntentForPackage(it)
                     }?.let {
                         sleep(1000)

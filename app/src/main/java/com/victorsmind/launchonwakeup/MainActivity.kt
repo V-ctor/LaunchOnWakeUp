@@ -2,10 +2,8 @@ package com.victorsmind.launchonwakeup
 
 import android.app.Instrumentation
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
@@ -20,12 +18,7 @@ import kotlinx.android.synthetic.main.content_main.*
 import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
-    private val settings: SharedPreferences by lazy {
-        PreferenceManager.getDefaultSharedPreferences(
-            this
-        )
-    }
-    private val editor by lazy { settings.edit() }
+    private val storage = Storage(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,10 +35,9 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 TODO("Not yet implemented")
             }
 
-            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                editor.putString(LAUNCHER_PACKAGE_KEY, p0?.getItemAtPosition(p2)?.toString())
-                editor.apply()
-            }
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) =
+                storage.getSettings().copy(launcherApp = p0?.getItemAtPosition(p2)?.toString())
+                    .let { storage.setSettings(it) }
         }
         val pm = packageManager
         val packages = pm.getInstalledApplications(PackageManager.GET_META_DATA)
@@ -55,12 +47,14 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         dropdown1.adapter = adapter1
         dropdown2.adapter = adapter2
 
-        settings.getString(AUTO_START_PACKAGE_KEY, null)?.let {
+        val settings = storage.getSettings()
+
+        settings.autoStartApp?.let {
             adapter1.getPosition(it)
         }?.let {
             dropdown1.setSelection(it)
         }
-        settings.getString(LAUNCHER_PACKAGE_KEY, null)?.let {
+        settings.launcherApp?.let {
             adapter2.getPosition(it)
         }?.let {
             dropdown2.setSelection(it)
@@ -100,15 +94,13 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 //        TODO("Not yet implemented")
     }
 
-    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-//        TODO("Not yet implemented")
-        editor.putString(AUTO_START_PACKAGE_KEY, p0?.getItemAtPosition(p2)?.toString())
-        editor.apply()
-    }
+    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) =
+        storage.getSettings().copy(autoStartApp = p0?.getItemAtPosition(p2)?.toString())
+            .let { storage.setSettings(it) }
 
     fun onStartButtonClick(view: View?) {
         runCatching {
-            startIntent(settings.getString(AUTO_START_PACKAGE_KEY, null))
+            startIntent(storage.getSettings().autoStartApp)
         }.onFailure {
             Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
         }
@@ -116,7 +108,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
     fun onStartButtonClick2(view: View?) {
         runCatching {
-            startIntent(settings.getString(LAUNCHER_PACKAGE_KEY, null))
+            startIntent(storage.getSettings().launcherApp)
         }.onFailure {
             Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
         }
@@ -129,9 +121,4 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                     ?: throw IllegalArgumentException("Package $it not found")
             }
             ?.let { startActivity(it) }
-
-    companion object {
-        const val AUTO_START_PACKAGE_KEY = "autoStartPackageKey"
-        const val LAUNCHER_PACKAGE_KEY = "launcherPackageKey"
-    }
 }
