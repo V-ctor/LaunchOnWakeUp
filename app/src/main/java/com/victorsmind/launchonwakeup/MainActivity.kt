@@ -17,7 +17,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import kotlin.concurrent.thread
 
-class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
+class MainActivity : AppCompatActivity() {
     private val storage = Storage(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,10 +27,19 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         val intent = Intent(this, MainService::class.java)
         startService(intent)
 
-        val dropdown1: Spinner = spinner1
-        val dropdown2: Spinner = spinner2
-        spinner1.onItemSelectedListener = this
-        spinner2.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        val dropdown1: Spinner = autoStartAppSpinner
+        val dropdown2: Spinner = launcherAppSpinner
+        autoStartAppSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) =
+                storage.getSettings().copy(autoStartApp = p0?.getItemAtPosition(p2)?.toString())
+                    .let { storage.setSettings(it) }
+        }
+
+        launcherAppSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) {
                 TODO("Not yet implemented")
             }
@@ -89,14 +98,6 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
         }
     }
-
-    override fun onNothingSelected(p0: AdapterView<*>?) {
-//        TODO("Not yet implemented")
-    }
-
-    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) =
-        storage.getSettings().copy(autoStartApp = p0?.getItemAtPosition(p2)?.toString())
-            .let { storage.setSettings(it) }
 
     fun onStartButtonClick(view: View?) {
         runCatching {
