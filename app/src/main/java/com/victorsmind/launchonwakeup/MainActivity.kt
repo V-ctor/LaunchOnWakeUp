@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.View
-import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.Toast
@@ -28,25 +27,6 @@ class MainActivity : AppCompatActivity() {
 
         val dropdown1: Spinner = autoStartAppSpinner
         val dropdown2: Spinner = launcherAppSpinner
-        autoStartAppSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(p0: AdapterView<*>?) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) =
-                storage.getSettings().copy(autoStartApp = p0?.getItemAtPosition(p2)?.toString())
-                    .let { storage.setSettings(it) }
-        }
-
-        launcherAppSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(p0: AdapterView<*>?) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) =
-                storage.getSettings().copy(launcherApp = p0?.getItemAtPosition(p2)?.toString())
-                    .let { storage.setSettings(it) }
-        }
         val pm = packageManager
         val packages = pm.getInstalledApplications(PackageManager.GET_META_DATA)
         val items = packages.map { it.packageName }.sorted()
@@ -88,7 +68,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun onStartButtonClick(view: View?) {
+    fun onAutoStartAppButtonClick(view: View?) {
         runCatching {
             startIntent(storage.getSettings().autoStartApp)
         }.onFailure {
@@ -96,12 +76,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun onStartButtonClick2(view: View?) {
+    fun onLauncherButtonClick(view: View?) {
         runCatching {
             startIntent(storage.getSettings().launcherApp)
         }.onFailure {
             Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
         }
+    }
+
+    fun onSaveButtonClick(view: View) {
+        val autoStartApp = autoStartAppSpinner.selectedItem.toString()
+        val launcherApp = launcherAppSpinner.selectedItem.toString()
+        storage.getSettings().copy(autoStartApp = autoStartApp, launcherApp = launcherApp)
+            .let { storage.setSettings(it) }
     }
 
     private fun startIntent(packageName: String?): Unit? =

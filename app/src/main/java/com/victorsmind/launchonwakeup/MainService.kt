@@ -22,7 +22,7 @@ class MainService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        registBroadcastReceiver()
+        registerBroadcastReceiver()
 
         if (Build.VERSION.SDK_INT >= 26) {
             val CHANNEL_ID = "your_channel_id"
@@ -51,7 +51,7 @@ class MainService : Service() {
 
     private var mPowerKeyReceiver: BroadcastReceiver? = null
 
-    private fun registBroadcastReceiver() {
+    private fun registerBroadcastReceiver() {
         val theFilter = IntentFilter()
         /** System Defined Broadcast  */
         theFilter.addAction(Intent.ACTION_SCREEN_ON)
