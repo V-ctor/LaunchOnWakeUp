@@ -13,12 +13,9 @@ import android.os.SystemClock.sleep
 import androidx.core.app.NotificationCompat
 
 class MainService : Service() {
-
     private val storage = Storage(this)
 
-    override fun onBind(p0: Intent?): IBinder? {
-        return null
-    }
+    override fun onBind(p0: Intent?): IBinder? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -45,7 +42,7 @@ class MainService : Service() {
     }
 
     override fun onDestroy() {
-//        super.onDestroy()
+        super.onDestroy()
         unregisterReceiver()
     }
 
@@ -61,10 +58,11 @@ class MainService : Service() {
             override fun onReceive(context: Context, intent: Intent) {
                 val strAction = intent.action
                 if (strAction == Intent.ACTION_SCREEN_ON || strAction == Intent.ACTION_BOOT_COMPLETED) {
-                    storage.getSettings().autoStartApp?.let {
+                    val settings = storage.getSettings()
+                    settings.autoStartApp?.let {
                         packageManager.getLaunchIntentForPackage(it)
                     }?.let {
-                        sleep(1000)
+                        sleep(settings.timeDelay.toLong())
                         startActivity(it)
                     } /*?: Toast.makeText(this, "Inent could not be started.", Toast.LENGTH_SHORT)
                         .show()*/

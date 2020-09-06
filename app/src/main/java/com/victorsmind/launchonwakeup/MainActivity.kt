@@ -8,7 +8,6 @@ import android.view.KeyEvent
 import android.view.Menu
 import android.view.View
 import android.widget.ArrayAdapter
-import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
@@ -25,28 +24,27 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(this, MainService::class.java)
         startService(intent)
 
-        val dropdown1: Spinner = autoStartAppSpinner
-        val dropdown2: Spinner = launcherAppSpinner
         val pm = packageManager
         val packages = pm.getInstalledApplications(PackageManager.GET_META_DATA)
         val items = packages.map { it.packageName }.sorted()
         val adapter1 = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, items)
         val adapter2 = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, items)
-        dropdown1.adapter = adapter1
-        dropdown2.adapter = adapter2
+        autoStartAppSpinner.adapter = adapter1
+        launcherAppSpinner.adapter = adapter2
 
         val settings = storage.getSettings()
 
         settings.autoStartApp?.let {
             adapter1.getPosition(it)
         }?.let {
-            dropdown1.setSelection(it)
+            autoStartAppSpinner.setSelection(it)
         }
         settings.launcherApp?.let {
             adapter2.getPosition(it)
         }?.let {
-            dropdown2.setSelection(it)
+            launcherAppSpinner.setSelection(it)
         }
+        timeDelay.setText(settings.timeDelay.toString())
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -87,7 +85,9 @@ class MainActivity : AppCompatActivity() {
     fun onSaveButtonClick(view: View) {
         val autoStartApp = autoStartAppSpinner.selectedItem.toString()
         val launcherApp = launcherAppSpinner.selectedItem.toString()
-        storage.getSettings().copy(autoStartApp = autoStartApp, launcherApp = launcherApp)
+        val timeDelay = timeDelay.text.toString().toIntOrNull()!!
+        storage.getSettings()
+            .copy(autoStartApp = autoStartApp, launcherApp = launcherApp, timeDelay = timeDelay)
             .let { storage.setSettings(it) }
     }
 
