@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun onAutoStartAppButtonClick(view: View?) {
         runCatching {
             startIntent(storage.getSettings().autoStartApp)
@@ -58,6 +59,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun onLauncherButtonClick(view: View?) {
         runCatching {
             startIntent(storage.getSettings().launcherApp)
@@ -66,6 +68,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun onSaveButtonClick(view: View) {
         val autoStartApp = autoStartAppSpinner.selectedItem.toString()
         val launcherApp = launcherAppSpinner.selectedItem.toString()
