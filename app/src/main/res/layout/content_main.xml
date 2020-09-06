@@ -62,7 +62,7 @@
 
     <Button
         android:id="@+id/autoStartAppButton"
-        android:text="Start"
+        android:text="@string/auto_start_app_button_caption"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="onAutoStartAppButtonClick"
@@ -103,7 +103,7 @@
 
     <Button
         android:id="@+id/launcherButton"
-        android:text="Start"
+        android:text="@string/launcher_button_caption"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="onLauncherButtonClick"
@@ -117,7 +117,7 @@
 
     <Button
         android:id="@+id/saveButton"
-        android:text="Save"
+        android:text="@string/save_button_caption"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="onSaveButtonClick"
