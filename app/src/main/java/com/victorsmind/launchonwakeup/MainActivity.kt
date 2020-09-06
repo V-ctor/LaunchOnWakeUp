@@ -1,10 +1,8 @@
 package com.victorsmind.launchonwakeup
 
-import android.app.Instrumentation
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.view.KeyEvent
 import android.view.Menu
 import android.view.View
 import android.widget.ArrayAdapter
@@ -12,7 +10,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
-import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
     private val storage = Storage(this)
@@ -51,19 +48,6 @@ class MainActivity : AppCompatActivity() {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
-    }
-
-    fun sendMessage(view: View) {
-        val launchIntent: Intent? = packageManager.getLaunchIntentForPackage("tc.planeta.tv.stb")
-        if (launchIntent != null) {
-            startActivity(launchIntent)
-            thread {
-                val inst = Instrumentation()
-                inst.sendKeyDownUpSync(KeyEvent.KEYCODE_1)
-                inst.sendKeyDownUpSync(KeyEvent.KEYCODE_1)
-            }.start()
-
-        }
     }
 
     fun onAutoStartAppButtonClick(view: View?) {
