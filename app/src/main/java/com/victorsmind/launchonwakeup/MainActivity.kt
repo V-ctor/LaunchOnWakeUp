@@ -1,6 +1,7 @@
 package com.victorsmind.launchonwakeup
 
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.Menu
@@ -25,7 +26,18 @@ class MainActivity : AppCompatActivity() {
         val packages = pm.getInstalledApplications(PackageManager.GET_META_DATA)
         val items = packages.map { it.packageName }.sorted()
         val adapter1 = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, items)
-        val adapter2 = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, items)
+        val existingLaunchers = packages
+            .mapNotNull {
+                Launcher(
+                    it,
+                    runCatching {
+                        packageManager.getLeanbackLaunchIntentForPackage(it.packageName)?.categories?.contains("android.intent.category.LEANBACK_LAUNCHER")
+                    }.getOrNull() == true
+                )
+            }
+            .sortedWith(compareByDescending<Launcher> { it.isLauncher }.thenBy { it.pkg.name })
+            .map { it.pkg.packageName }
+        val adapter2 = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, existingLaunchers)
         autoStartAppSpinner.adapter = adapter1
         launcherAppSpinner.adapter = adapter2
 
@@ -35,12 +47,14 @@ class MainActivity : AppCompatActivity() {
             adapter1.getPosition(it)
         }?.let {
             autoStartAppSpinner.setSelection(it)
-        }
+        } ?: autoStartAppSpinner.setSelection(0)
+
         settings.launcherApp?.let {
             adapter2.getPosition(it)
         }?.let {
             launcherAppSpinner.setSelection(it)
-        }
+        } ?: launcherAppSpinner.setSelection(0)
+
         timeDelay.setText(settings.timeDelay.toString())
     }
 
@@ -86,3 +100,5 @@ class MainActivity : AppCompatActivity() {
             }
             ?.let { startActivity(it) }
 }
+
+data class Launcher(val pkg: ApplicationInfo, val isLauncher: Boolean)
