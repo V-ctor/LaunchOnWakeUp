@@ -31,28 +31,20 @@ class MainActivity : AppCompatActivity() {
 
         val packages = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
         val items = packages.map { it.packageName }.sorted()
-        val adapter1 = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, items)
+        val autoStartAppAdapter = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, items)
         val launcherIntent = Intent(Intent.ACTION_MAIN).apply { addCategory(Intent.CATEGORY_HOME) }
         val installedLaunchers =
             packageManager.queryIntentActivities(launcherIntent, 0).map { it.activityInfo.packageName }.sorted()
 
-        val adapter2 = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, installedLaunchers)
-        autoStartAppSpinner.adapter = adapter1
-        launcherAppSpinner.adapter = adapter2
+        val launcherAppAdapter = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, installedLaunchers)
+        autoStartAppSpinner.adapter = autoStartAppAdapter
+        launcherAppSpinner.adapter = launcherAppAdapter
 
         val settings = storage.getSettings()
 
-        settings.autoStartApp?.let {
-            adapter1.getPosition(it)
-        }?.let {
-            autoStartAppSpinner.setSelection(it)
-        } ?: autoStartAppSpinner.setSelection(0)
+        autoStartAppSpinner.setSelection(settings.autoStartApp?.let { autoStartAppAdapter.getPosition(it) } ?: 0)
 
-        settings.launcherApp?.let {
-            adapter2.getPosition(it)
-        }?.let {
-            launcherAppSpinner.setSelection(it)
-        } ?: launcherAppSpinner.setSelection(0)
+        launcherAppSpinner.setSelection(settings.launcherApp?.let { launcherAppAdapter.getPosition(it) } ?: 0)
 
         timeDelay.setText(settings.timeDelay.toString())
     }
