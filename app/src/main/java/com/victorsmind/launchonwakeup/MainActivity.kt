@@ -4,7 +4,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Toast
@@ -30,8 +29,7 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(this, MainService::class.java)
         startService(intent)
 
-        val pm = packageManager
-        val packages = pm.getInstalledApplications(PackageManager.GET_META_DATA)
+        val packages = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
         val items = packages.map { it.packageName }.sorted()
         val adapter1 = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, items)
         val launcherIntent = Intent(Intent.ACTION_MAIN).apply { addCategory(Intent.CATEGORY_HOME) }
@@ -57,12 +55,6 @@ class MainActivity : AppCompatActivity() {
         } ?: launcherAppSpinner.setSelection(0)
 
         timeDelay.setText(settings.timeDelay.toString())
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
     }
 
     @Suppress("UNUSED_PARAMETER")
