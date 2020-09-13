@@ -63,7 +63,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun startThirdPartyLauncher(): Intent? =
         runCatching {
-            startIntent(storage.getSettings().launcherApp)
+            startIntent(storage.getSettings().launcherApp).also {
+                finishAffinity()
+            }
         }.onFailure {
             Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
         }.getOrNull()
