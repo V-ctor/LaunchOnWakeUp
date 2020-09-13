@@ -3,6 +3,7 @@ package com.victorsmind.launchonwakeup
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.View
 import android.widget.ArrayAdapter
@@ -16,6 +17,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.i("MainActivity", "referrer='$referrer'")
+        if (referrer?.authority == null || referrer?.authority == "android") {
+            startThirdPartyLauncher() ?: createMainWindow()
+        } else
+            createMainWindow()
+    }
+
+    private fun createMainWindow() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
         val intent = Intent(this, MainService::class.java)
@@ -66,13 +75,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     @Suppress("UNUSED_PARAMETER")
-    fun onLauncherButtonClick(view: View?) {
+    fun onLauncherButtonClick(view: View?) = startThirdPartyLauncher()
+
+    private fun startThirdPartyLauncher(): Intent? =
         runCatching {
             startIntent(storage.getSettings().launcherApp)
         }.onFailure {
             Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
-        }
-    }
+        }.getOrNull()
 
     @Suppress("UNUSED_PARAMETER")
     fun onSaveButtonClick(view: View) {
@@ -84,11 +94,10 @@ class MainActivity : AppCompatActivity() {
             .let { storage.setSettings(it) }
     }
 
-    private fun startIntent(packageName: String?): Unit? =
+    private fun startIntent(packageName: String?): Intent? =
         packageName
-            ?.let {
-                packageManager.getLaunchIntentForPackage(it)
-                    ?: throw IllegalArgumentException("Package $it not found")
-            }
-            ?.let { startActivity(it) }
+            ?.runCatching { packageManager.getLaunchIntentForPackage(this) }
+            ?.onSuccess { startActivity(it) }
+            ?.onFailure { it.printStackTrace() }
+            ?.getOrNull()
 }
