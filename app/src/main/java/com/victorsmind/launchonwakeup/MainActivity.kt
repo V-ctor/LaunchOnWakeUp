@@ -3,7 +3,6 @@ package com.victorsmind.launchonwakeup
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Toast
@@ -16,7 +15,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.i("MainActivity", "referrer='$referrer'")
         if (referrer?.authority == null || referrer?.authority == "android") {
             startThirdPartyLauncher() ?: createMainWindow()
         } else

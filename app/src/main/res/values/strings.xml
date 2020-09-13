@@ -3,6 +3,7 @@
     <string name="action_settings">Settings</string>
     <string name="select_auto_start_app">Select auto start app</string>
     <string name="select_launcher">Select launcher</string>
+    <string name="project_uri">https://github.com/V-ctor/LaunchOnWakeUp</string>
     <string name="select_delay">Select delay, ms</string>
     <string name="auto_start_app_button_caption">Start</string>
     <string name="launcher_button_caption">Start</string>

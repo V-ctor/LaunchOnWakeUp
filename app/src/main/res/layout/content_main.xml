@@ -129,4 +129,16 @@
         app:layout_constraintTop_toBottomOf="@id/launcherAppSpinner"
         app:layout_constraintVertical_bias="0.0" />
 
+    <TextView
+        android:id="@+id/projectUri"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/project_uri"
+        android:autoLink="web"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/saveButton"
+        app:layout_constraintVertical_bias="0.0" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
