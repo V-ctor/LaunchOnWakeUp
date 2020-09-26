@@ -3,20 +3,39 @@ package com.victorsmind.launchonwakeup
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import kotlin.system.exitProcess
+
+var isServiceStarted: Boolean = false
 
 class MainActivity : AppCompatActivity() {
     private val storage = Storage(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.i("LaunchOnWakeUp.MainActivity", "referrer.authority = ${referrer?.authority}")
+
         super.onCreate(savedInstanceState)
-        if (referrer?.authority == null || referrer?.authority == "android") {
-            startThirdPartyLauncher() ?: createMainWindow()
+        startService(Intent(this, MainService::class.java))
+
+/*        repeat(4) {
+            if (isServiceStarted) return@repeat
+            sleep(500L)
+        }
+        if (isServiceStarted) {
+            isServiceStarted = false
+            return
+        }*/
+
+        if (/*!isServiceStarted &&*/ (referrer?.authority == null || referrer?.authority == "android")) {
+            isServiceStarted = false
+            val startThirdPartyLauncher = startThirdPartyLauncher()
+            startThirdPartyLauncher ?: createMainWindow()
         } else
             createMainWindow()
     }
@@ -24,8 +43,6 @@ class MainActivity : AppCompatActivity() {
     private fun createMainWindow() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-        val intent = Intent(this, MainService::class.java)
-        startService(intent)
 
         val packages = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
         val items = packages.map { it.packageName }.sorted()
@@ -60,13 +77,22 @@ class MainActivity : AppCompatActivity() {
     fun onLauncherButtonClick(view: View?) = startThirdPartyLauncher()
 
     private fun startThirdPartyLauncher(): Intent? =
-        runCatching {
-            startIntent(storage.getSettings().launcherApp).also {
+        storage.getSettings().launcherApp?.let {
+            runCatching {
+                startIntent(it)
+                /*.also {
                 finishAffinity()
+            }*/
             }
-        }.onFailure {
-            Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
-        }.getOrNull()
+                .onSuccess {
+//                    finishAffinity()
+                    exitProcess(0)
+//                    finish()
+                }
+                .onFailure {
+                    Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
+                }.getOrNull()
+        }
 
     @Suppress("UNUSED_PARAMETER")
     fun onSaveButtonClick(view: View) {

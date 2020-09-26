@@ -10,6 +10,7 @@ import android.content.IntentFilter
 import android.os.Build
 import android.os.IBinder
 import android.os.SystemClock.sleep
+import android.util.Log
 import androidx.core.app.NotificationCompat
 
 class MainService : Service() {
@@ -18,6 +19,7 @@ class MainService : Service() {
     override fun onBind(p0: Intent?): IBinder? = null
 
     override fun onCreate() {
+        Log.i("LaunchOnWakeUp.MainService", "onCreate")
         super.onCreate()
         registerBroadcastReceiver()
 
@@ -56,12 +58,14 @@ class MainService : Service() {
 
         mPowerKeyReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
+                Log.i("LaunchOnWakeUp.BroadcastReceiver", "onReceive")
                 val strAction = intent.action
                 if (strAction == Intent.ACTION_SCREEN_ON || strAction == Intent.ACTION_BOOT_COMPLETED) {
                     val settings = storage.getSettings()
                     settings.autoStartApp?.let {
                         packageManager.getLaunchIntentForPackage(it)
                     }?.let {
+                        isServiceStarted = true
                         sleep(settings.timeDelay.toLong())
                         startActivity(it)
                     } /*?: Toast.makeText(this, "Inent could not be started.", Toast.LENGTH_SHORT)
