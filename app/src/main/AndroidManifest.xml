@@ -4,6 +4,16 @@
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
+    <uses-feature
+        android:required="false"
+        android:name="android.hardware.faketouch" />
+    <uses-feature
+        android:required="false"
+        android:name="android.hardware.touchscreen" />
+    <uses-feature
+        android:name="android.software.leanback"
+        android:required="false" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -14,6 +24,7 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
+            android:banner="@id/autoStartAppSpinner"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -39,7 +50,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:name="com.victorsmind.launchonwakeup.MainService"></service>
+        <service android:name="com.victorsmind.launchonwakeup.MainService" />
     </application>
 
 </manifest>
