@@ -12,8 +12,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import kotlin.system.exitProcess
 
-var isServiceStarted: Boolean = false
-
 class MainActivity : AppCompatActivity() {
     private val storage = Storage(this)
 
@@ -23,19 +21,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         startService(Intent(this, MainService::class.java))
 
-/*        repeat(4) {
-            if (isServiceStarted) return@repeat
-            sleep(500L)
-        }
-        if (isServiceStarted) {
-            isServiceStarted = false
-            return
-        }*/
-
-        if (/*!isServiceStarted &&*/ (referrer?.authority == null || referrer?.authority == "android")) {
-            isServiceStarted = false
-            val startThirdPartyLauncher = startThirdPartyLauncher()
-            startThirdPartyLauncher ?: createMainWindow()
+        if (referrer?.authority == null || referrer?.authority == "android") {     //ugly solution to know who started app (manually or by Home button)
+            startThirdPartyLauncher() ?: createMainWindow()
         } else
             createMainWindow()
     }
@@ -80,14 +67,9 @@ class MainActivity : AppCompatActivity() {
         storage.getSettings().launcherApp?.let {
             runCatching {
                 startIntent(it)
-                /*.also {
-                finishAffinity()
-            }*/
             }
                 .onSuccess {
-//                    finishAffinity()
-                    exitProcess(0)
-//                    finish()
+                    exitProcess(0)  //may be it is not necessary
                 }
                 .onFailure {
                     Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()

@@ -44,8 +44,8 @@ class MainService : Service() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
-        unregisterReceiver()
+//        super.onDestroy()
+//        unregisterReceiver()
     }
 
     private var mPowerKeyReceiver: BroadcastReceiver? = null
@@ -65,7 +65,6 @@ class MainService : Service() {
                     settings.autoStartApp?.let {
                         packageManager.getLaunchIntentForPackage(it)
                     }?.let {
-                        isServiceStarted = true
                         sleep(settings.timeDelay.toLong())
                         startActivity(it)
                     } /*?: Toast.makeText(this, "Inent could not be started.", Toast.LENGTH_SHORT)
