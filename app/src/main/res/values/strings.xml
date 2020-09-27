@@ -8,4 +8,5 @@
     <string name="auto_start_app_button_caption">Start</string>
     <string name="launcher_button_caption">Start</string>
     <string name="save_button_caption">Save</string>
+    <string name="descriptionText">On first launch select app for autostart, default launcher and press \'Save\'.\nIf you want to start another app/launcher then you have to save it before press \'Start\'.</string>
 </resources>
